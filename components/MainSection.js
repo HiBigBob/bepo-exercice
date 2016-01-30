@@ -1,86 +1,49 @@
-import React, { Component, PropTypes } from 'react'
-import TodoItem from './TodoItem'
-import Footer from './Footer'
-import { SHOW_ALL, SHOW_COMPLETED, SHOW_ACTIVE } from '../constants/TodoFilters'
-
-const TODO_FILTERS = {
-  [SHOW_ALL]: () => true,
-  [SHOW_ACTIVE]: todo => !todo.completed,
-  [SHOW_COMPLETED]: todo => todo.completed
-}
+import React, { PropTypes, Component } from 'react'
+import BreadCrumb   from './BreadCrumb'
+import LeftMenu     from './LeftMenu'
+import KeyBoard     from './KeyBoard'
 
 class MainSection extends Component {
-  constructor(props, context) {
-    super(props, context)
-    this.state = { filter: SHOW_ALL }
-  }
-
-  handleClearCompleted() {
-    const atLeastOneCompleted = this.props.todos.some(todo => todo.completed)
-    if (atLeastOneCompleted) {
-      this.props.actions.clearCompleted()
+    constructor(props, context) {
+        super(props, context)
     }
-  }
 
-  handleShow(filter) {
-    this.setState({ filter })
-  }
-
-  renderToggleAll(completedCount) {
-    const { todos, actions } = this.props
-    if (todos.length > 0) {
-      return (
-        <input className="toggle-all"
-               type="checkbox"
-               checked={completedCount === todos.length}
-               onChange={actions.completeAll} />
-      )
+    render() {
+        const { practices, actions, actionsTicker, ticker } = this.props
+        
+        return (
+            <section className="main">
+                <div className="container">
+                    <div className="row">
+                        <div className="col-md-12">
+                            <BreadCrumb />
+                        </div>
+                    </div>
+                    <div className="row">
+                        <div className="col-md-3 col-sm-3 col-lg-3">
+                            {practices.map(practice =>
+                                <LeftMenu key={practice.id} practice={practice} ticker={ticker} {...actions} {...actionsTicker} />
+                            )}
+                        </div>
+                        <div className="col-md-8 col-sm-8 col-lg-8">
+                            {practices.map(practice =>
+                                <KeyBoard key={practice.id} practice={practice} ticker={ticker} {...actions} {...actionsTicker} />
+                            )}
+                        </div>
+                        <div className="col-md-1 col-sm-1 col-lg-1">
+                        </div>
+                    </div> 
+                </div> 
+            </section>
+        )
     }
-  }
-
-  renderFooter(completedCount) {
-    const { todos } = this.props
-    const { filter } = this.state
-    const activeCount = todos.length - completedCount
-
-    if (todos.length) {
-      return (
-        <Footer completedCount={completedCount}
-                activeCount={activeCount}
-                filter={filter}
-                onClearCompleted={this.handleClearCompleted.bind(this)}
-                onShow={this.handleShow.bind(this)} />
-      )
-    }
-  }
-
-  render() {
-    const { todos, actions } = this.props
-    const { filter } = this.state
-
-    const filteredTodos = todos.filter(TODO_FILTERS[filter])
-    const completedCount = todos.reduce((count, todo) =>
-      todo.completed ? count + 1 : count,
-      0
-    )
-
-    return (
-      <section className="main">
-        {this.renderToggleAll(completedCount)}
-        <ul className="todo-list">
-          {filteredTodos.map(todo =>
-            <TodoItem key={todo.id} todo={todo} {...actions} />
-          )}
-        </ul>
-        {this.renderFooter(completedCount)}
-      </section>
-    )
-  }
 }
 
 MainSection.propTypes = {
-  todos: PropTypes.array.isRequired,
-  actions: PropTypes.object.isRequired
+  practices: PropTypes.array.isRequired,
+  ticker: PropTypes.number.isRequired,
+  actions: PropTypes.object.isRequired,
+  actionsTicker: PropTypes.object.isRequired
 }
 
 export default MainSection

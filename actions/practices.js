@@ -1,4 +1,4 @@
-import * as types from '../constants/iActionTypes'
+import * as types from '../constants/ActionTypes'
 
 export function addPractice(text) {
   return { type: types.ADD_PRACTICE, text }
